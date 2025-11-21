@@ -1,0 +1,19 @@
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# OS
+.DS_Store
+Thumbs.db
+
+# App artifacts
+temp/
+client_saved/
+test_results/
+temp_test.png
+
+# Logs
+*.log

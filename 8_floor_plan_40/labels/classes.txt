@@ -1,0 +1,3 @@
+wall
+bed
+sofa1
