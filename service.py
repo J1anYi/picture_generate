@@ -10,7 +10,10 @@ import random
 import base64
 import re
 from fastapi.responses import FileResponse
-from langchain_community.embeddings import HuggingFaceEmbeddings
+try:
+    from langchain_huggingface import HuggingFaceEmbeddings
+except Exception:
+    from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain_core.documents import Document
 from deep_translator import GoogleTranslator
@@ -59,8 +62,13 @@ def get_vectorstore():
         return VS
     if not DOCS:
         DOCS = load_documents()
-    EMB = HuggingFaceEmbeddings(model_name="sentence-transformers/paraphrase-MiniLM-L6-v2")
-    VS = FAISS.from_documents(DOCS, EMB)
+    model_path = os.getenv("EMBEDDING_LOCAL_DIR")
+    model_name = os.getenv("EMBEDDING_MODEL", "sentence-transformers/paraphrase-MiniLM-L6-v2")
+    try:
+        EMB = HuggingFaceEmbeddings(model_name=model_path or model_name)
+        VS = FAISS.from_documents(DOCS, EMB)
+    except Exception as e:
+        raise HTTPException(status_code=503, detail=f"embedding init failed: {e}")
     return VS
 
 app = FastAPI()
